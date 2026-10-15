@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}SmartMart · Inventory{% endblock %}
+{% block page %}inventory{% endblock %}
+{% block navigation %}
+  <a class="nav-link" href="/admin">← Manager</a><a class="nav-link selected" href="/inventory">Inventory</a><a class="nav-link" href="/customer?cart=CART-01">Customer view</a>
+  <form action="/logout" method="post"><button class="nav-logout" type="submit">Sign out</button></form>
+{% endblock %}
+{% block content %}
+<section class="page-intro"><div><div class="eyebrow"><span class="eyebrow-mark"></span> CENTRAL STOCK CONTROL</div><h1>Inventory <em>intelligence.</em></h1><p>Track every product, available stock, and live RFID reservations.</p></div><a href="/admin" class="btn btn-outline">← Manager dashboard</a></section>
+<section class="mini-stats">
+  <div class="stat"><span class="stat-icon">▦</span><div><div class="stat-label">PRODUCT TYPES</div><div class="stat-value" id="inventory-skus">0</div></div></div>
+  <div class="stat"><span class="stat-icon">◫</span><div><div class="stat-label">AVAILABLE UNITS</div><div class="stat-value" id="inventory-available">0</div></div></div>
+  <div class="stat"><span class="stat-icon">◷</span><div><div class="stat-label">IN ACTIVE CARTS</div><div class="stat-value" id="inventory-reserved">0</div></div></div>
+  <div class="stat"><span class="stat-icon">✳</span><div><div class="stat-label">LOW STOCK ITEMS</div><div class="stat-value" id="inventory-low">0</div></div></div>
+</section>
+<section class="panel inventory-table-panel"><div class="panel-head"><div><div class="eyebrow muted">PRODUCT CATALOG</div><h2>All inventory products</h2><p>Available stock drops as soon as an RFID-tagged product enters a cart.</p></div><div class="inventory-filter"><input id="inventory-search" placeholder="Search products or SKU..." aria-label="Search products" /></div></div>
+  <div class="table-scroll"><table class="inventory-table"><thead><tr><th>Product</th><th>SKU</th><th>Section</th><th>Price</th><th>On hand</th><th>In carts</th><th>Available</th><th>Status</th></tr></thead><tbody id="inventory-table-body"></tbody></table></div>
+  <div class="table-foot"><span>On hand includes items reserved in carts. Available = on hand − reserved.</span><span id="inventory-rowcount"></span></div>
+</section>
+<section class="workspace inventory-bottom">
+  <div class="panel"><div class="panel-head"><div><div class="eyebrow muted">CATALOG MANAGEMENT</div><h2>Add a new product</h2><p>Register the product here before assigning an RFID tag in the Manager portal.</p></div></div>
+    <form id="product-form" class="form-grid product-grid"><label>Product name<input name="name" required placeholder="e.g. Brown rice" /></label><label>SKU<input name="sku" required placeholder="e.g. RICE-02" /></label><label>Category<input name="category" required placeholder="e.g. Grocery" /></label><label>Price (₹)<input name="price" type="number" min="0" step="0.01" required /></label><label>Initial stock<input name="stock" type="number" min="0" step="1" required /></label><label>Store section<select name="zone" id="product-zone"></select></label><label>Product emoji<input name="emoji" maxlength="8" placeholder="📦" /></label><button class="btn btn-primary form-submit" type="submit">Add product</button></form>
+  </div>
+  <div class="right-stack">
+    <div class="panel compact-panel"><div class="panel-head"><div><div class="eyebrow muted">STOCK RECEIVING</div><h2>Restock shelves</h2></div></div><form id="restock-form" class="stacked-form"><label>Product<select id="restock-product" name="product_id"></select></label><label>Units received<input name="amount" type="number" min="1" step="1" required value="5" /></label><button class="btn btn-dark" type="submit">Add to inventory</button></form></div>
+    <div class="panel compact-panel"><div class="panel-head"><div><div class="eyebrow muted">SCANNER NOTIFICATIONS</div><h2>Latest stock activity</h2></div></div><div id="inventory-events" class="event-stream compact-events"></div></div>
+  </div>
+</section>
+{% endblock %}

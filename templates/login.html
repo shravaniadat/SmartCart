@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}SmartMart · Manager sign in{% endblock %}
+{% block page %}login{% endblock %}
+{% block navigation %}<a class="nav-link" href="/customer?cart=CART-01">Customer view</a>{% endblock %}
+{% block content %}
+<div class="login-wrap"><div class="login-mark">⌑</div><div class="eyebrow muted">RESTRICTED OPERATIONS PORTAL</div><h1>Manager <em>sign in.</em></h1><p>Inventory, RFID registration and payment confirmation are protected.</p>
+<form method="post" class="login-form"><label>Password<input type="password" name="password" required autofocus autocomplete="current-password" placeholder="Manager password" /></label><button class="btn btn-primary btn-wide" type="submit">Continue to manager →</button></form>
+{% if error %}<div class="form-error">{{error}}</div>{% endif %}
+</div>
+{% endblock %}

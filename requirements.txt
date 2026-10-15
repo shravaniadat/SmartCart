@@ -1,0 +1,4 @@
+Flask>=2.3,<4
+qrcode[pil]>=7.4
+# On Raspberry Pi, use a 3.3V RC522 and install mfrc522 plus compatible GPIO dependencies.
+# Hardware-only dependency: pip install --no-deps mfrc522

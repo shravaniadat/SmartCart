@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}SmartMart · Customer{% endblock %}
+{% block page %}customer{% endblock %}
+{% block data %}data-cart="{{ cart_id }}"{% endblock %}
+{% block navigation %}
+  <a class="nav-link selected" href="/customer?cart={{cart_id}}">Customer store</a>
+  <span class="nav-chip" id="cart-code">{{cart_id}}</span>
+{% endblock %}
+{% block content %}
+<section class="hero customer-hero">
+  <div><div class="eyebrow"><span class="eyebrow-mark"></span> YOUR SMART SHOPPING COMPANION</div>
+    <h1>Shop smarter.<br><em>Skip the queue.</em></h1>
+    <p>Explore the store, scan RFID-tagged products into your trolley and check out in seconds.</p>
+    <div class="hero-note"><span class="pulse-small"></span> Cart and billing update automatically when the RFID reader scans a tag.</div>
+  </div>
+  <div class="hero-art" aria-hidden="true"><div class="halo halo1"></div><div class="halo halo2"></div><div class="shopbag">▣</div><div class="floating-pill">✦ Smart shopping</div></div>
+</section>
+<section class="mini-stats" aria-label="Your shopping statistics">
+  <div class="stat"><span class="stat-icon">⌖</span><div><div class="stat-label">YOUR LOCATION</div><div class="stat-value" id="your-location">Entrance</div></div></div>
+  <div class="stat"><span class="stat-icon">▤</span><div><div class="stat-label">ITEMS IN CART</div><div class="stat-value" id="item-count">0 items</div></div></div>
+  <div class="stat"><span class="stat-icon">₹</span><div><div class="stat-label">CURRENT TOTAL</div><div class="stat-value" id="cart-total-top">₹0.00</div></div></div>
+</section>
+<section class="workspace customer-workspace">
+  <div class="panel map-panel">
+    <div class="panel-head"><div><div class="eyebrow muted">FIND YOUR WAY</div><h2>Shop floor map</h2><p>Product locations by section, with your cart's reported location.</p></div><span class="label-pill">FLOOR 01</span></div>
+    <div class="map-key"><span><i class="legend-cart"></i> Your cart</span><span><i class="legend-section"></i> Product section</span></div>
+    <div class="floor-map" id="customer-map"><div class="map-loading">Loading the store map...</div></div>
+    <div class="map-caption"><span class="info-bubble">i</span> Cart location is updated by the manager for this prototype. Automatic indoor tracking requires extra hardware.</div>
+  </div>
+  <aside class="panel cart-panel">
+    <div class="panel-head"><div><div class="eyebrow muted">CONTACTLESS CHECKOUT</div><h2>Your shopping cart</h2></div><span id="cart-count-bubble" class="count-bubble">0</span></div>
+    <div class="cart-help">Hold an RFID-tagged product near the reader to add it. Manual item adding is disabled.</div>
+    <div class="cart-items" id="cart-items"><div class="empty-state"><div class="empty-icon">◌</div><strong>Your cart is waiting</strong><p>Scan an RFID tag to get started.</p></div></div>
+    <div class="bill-bottom"><div class="bill-line"><span>Subtotal</span><span id="subtotal">₹0.00</span></div><div class="bill-line total"><span>Total to pay</span><strong id="bill-total">₹0.00</strong></div>
+      <div id="cart-status" class="cart-status"></div>
+      <button class="btn btn-primary btn-wide" id="checkout-btn">Checkout &amp; generate QR <span>↗</span></button>
+      <button class="btn btn-ghost btn-wide" id="clear-btn">Clear cart</button>
+      <p class="checkout-note">A QR payment request is not payment confirmation. Stock is finalized only after manager verification.</p>
+    </div>
+  </aside>
+</section>
+<div class="modal-backdrop" id="checkout-modal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button class="modal-close" id="close-modal" aria-label="Close">×</button>
+    <div class="modal-icon">▧</div><div class="eyebrow muted">SECURE CHECKOUT</div><h2 id="modal-title">Scan to pay</h2>
+    <p>Pay the exact amount for this cart. Keep the order ID for verification.</p>
+    <div class="qr-wrap"><img id="payment-qr" alt="QR code for this shopping cart payment request" /></div>
+    <div class="modal-total" id="payment-amount">₹0.00</div>
+    <div class="modal-order" id="payment-order"></div>
+    <div class="qr-note" id="payment-message"></div>
+    <button class="btn btn-outline btn-wide" id="payment-close">Back to cart</button>
+  </div>
+</div>
+{% endblock %}

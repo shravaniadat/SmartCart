@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}SmartMart · Manager{% endblock %}
+{% block page %}admin{% endblock %}
+{% block navigation %}
+  <a class="nav-link selected" href="/admin">Manager</a><a class="nav-link" href="/inventory">Inventory <span>↗</span></a><a class="nav-link" href="/customer?cart=CART-01">Customer view</a>
+  <form action="/logout" method="post"><button class="nav-logout" type="submit">Sign out</button></form>
+{% endblock %}
+{% block content %}
+<section class="page-intro"><div><div class="eyebrow"><span class="eyebrow-mark"></span> STORE OPERATIONS</div><h1>Manager <em>overview.</em></h1><p>See every cart, manage RFID tags, and monitor live store activity.</p></div><a class="btn btn-primary" href="/inventory">Open inventory <span>↗</span></a></section>
+<section class="mini-stats admin-stats">
+  <div class="stat"><span class="stat-icon">🛒</span><div><div class="stat-label">REGISTERED CARTS</div><div class="stat-value" id="admin-carts">3</div></div></div>
+  <div class="stat"><span class="stat-icon">◉</span><div><div class="stat-label">RFID SCANS</div><div class="stat-value" id="admin-scans">0</div></div></div>
+  <div class="stat"><span class="stat-icon">◷</span><div><div class="stat-label">PENDING CHECKOUTS</div><div class="stat-value" id="admin-pending">0</div></div></div>
+  <div class="stat"><span class="stat-icon">△</span><div><div class="stat-label">UNKNOWN TAGS</div><div class="stat-value" id="admin-unknown">0</div></div></div>
+</section>
+<section class="workspace admin-workspace">
+  <div class="panel map-panel"><div class="panel-head"><div><div class="eyebrow muted">LOCATION CONTROL</div><h2>Live shop overview</h2><p>All carts and product sections on one floor map.</p></div><span class="label-pill">DEMO TRACKING</span></div>
+    <div class="map-key"><span><i class="legend-cart"></i> Reported cart location</span><span><i class="legend-section"></i> Store section</span></div>
+    <div class="floor-map" id="admin-map"></div>
+    <div class="map-caption"><span class="info-bubble">i</span> Positions are manager-entered, not measured automatically.</div>
+  </div>
+  <div class="right-stack">
+    <div class="panel compact-panel"><div class="panel-head"><div><div class="eyebrow muted">HARDWARE CONTROL</div><h2>RFID reader</h2></div><span id="reader-status" class="tag tag-warning">Checking...</span></div>
+      <p class="small-muted">Your single RC522 can send scans to one selected cart at a time.</p>
+      <form id="reader-form" class="stacked-form"><label>Reader assigned to<select id="reader-cart" name="cart_id"><option>CART-01</option></select></label><button class="btn btn-dark" type="submit">Assign reader</button></form>
+      <div id="demo-scanner" class="demo-section" hidden><div class="eyebrow muted">TEST MODE ONLY</div><form id="demo-form" class="inline-form"><input id="demo-uid" placeholder="Registered tag UID" required/><button type="submit" class="btn btn-outline">Test scan</button></form></div>
+    </div>
+    <div class="panel compact-panel"><div class="panel-head"><div><div class="eyebrow muted">CART LOCATION</div><h2>Update position</h2></div></div>
+      <form id="location-form" class="stacked-form"><label>Cart<select id="location-cart" name="cart_id"></select></label><label>Current section<select id="location-zone" name="zone"></select></label><button type="submit" class="btn btn-dark">Update position</button></form>
+    </div>
+  </div>
+</section>
+<section class="workspace admin-bottom">
+  <div class="panel"><div class="panel-head"><div><div class="eyebrow muted">IDENTIFICATION</div><h2>RFID tag management</h2><p>Assign a physical tag UID to a product, or unregister one.</p></div></div>
+    <form id="register-form" class="form-grid"><label>RFID UID<input name="uid" id="register-uid" placeholder="e.g. 799992525454" required /></label><label>Product<select name="product_id" id="register-product" required></select></label><button class="btn btn-primary form-submit" type="submit">Register RFID tag</button></form>
+    <div class="divider-line"></div>
+    <form id="unregister-form" class="inline-form"><input id="unregister-uid" placeholder="Tag UID to unregister" required /><button class="btn btn-outline" type="submit">Unregister</button></form>
+    <h3 class="subheading">Recently registered tags</h3><div id="tag-list" class="tag-list"><div class="small-muted">Loading...</div></div>
+  </div>
+  <div class="panel"><div class="panel-head"><div><div class="eyebrow muted">REAL-TIME NOTIFICATIONS</div><h2>Store activity</h2><p>Manager alerts when a product is scanned, registered, or billed.</p></div><span class="activity-dot"></span></div>
+    <div id="admin-events" class="event-stream"></div>
+    <h3 class="subheading">Awaiting payment verification</h3><div id="pending-orders" class="pending-list"></div>
+  </div>
+</section>
+{% endblock %}

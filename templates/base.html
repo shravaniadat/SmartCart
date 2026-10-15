@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}SmartMart{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static',filename='site.css') }}" />
+  <meta name="theme-color" content="#f6f8f7" />
+</head>
+<body data-page="{% block page %}base{% endblock %}" {% block data %}{% endblock %}>
+  <header class="topbar">
+    <div class="shell nav-flex">
+      <a class="brand" href="/customer?cart=CART-01" aria-label="SmartMart home">
+        <span class="brand-icon"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 3 2 2 2 12h12l2-10H5"/><circle cx="9" cy="21" r="1"/><circle cx="18" cy="21" r="1"/></svg></span>
+        <span class="brand-word">smart<span>mart</span><small>CONNECTED RETAIL</small></span>
+      </a>
+      <nav class="nav-links" aria-label="Portal navigation">
+        {% block navigation %}{% endblock %}
+      </nav>
+      <div class="nav-status"><span class="status-dot"></span><span>LOCAL NETWORK</span></div>
+    </div>
+  </header>
+  <main class="shell main-shell">{% block content %}{% endblock %}</main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="{{ url_for('static',filename='app.js') }}" defer></script>
+</body>
+</html>
