@@ -1,0 +1,18 @@
+# Raspberry Pi 4B hardware extras (Raspberry Pi OS Bookworm, 64-bit).
+# Install AFTER requirements.txt, inside the venv:
+#   pip install -r requirements-pi.txt
+#   pip install --no-deps mfrc522      <- --no-deps, otherwise it pulls RPi.GPIO,
+#                                         which clashes with rpi-lgpio below
+#
+# RC522 over SPI
+spidev>=3.6
+# RPi.GPIO-compatible API on top of lgpio (works on Bookworm kernels).
+# Needs: sudo apt install liblgpio-dev swig python3-dev   (or python3-lgpio + venv --system-site-packages)
+# Do NOT also install RPi.GPIO.
+rpi-lgpio>=0.6
+# HX711 is read by hardware/scale.py itself (bit-banged on GPIO), no extra package.
+# Optional: Arduino-over-USB scale (SCALE_DRIVER=serial)
+pyserial>=3.5
+# 16x2 I2C LCD (PCF8574 backpack)
+smbus2>=0.4
+RPLCD>=1.3

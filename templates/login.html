@@ -4,7 +4,8 @@
 {% block navigation %}<a class="nav-link" href="/customer?cart=CART-01">Customer view</a>{% endblock %}
 {% block content %}
 <div class="login-wrap"><div class="login-mark">⌑</div><div class="eyebrow muted">RESTRICTED OPERATIONS PORTAL</div><h1>Manager <em>sign in.</em></h1><p>Inventory, RFID registration and payment confirmation are protected.</p>
-<form method="post" class="login-form"><label>Password<input type="password" name="password" required autofocus autocomplete="current-password" placeholder="Manager password" /></label><button class="btn btn-primary btn-wide" type="submit">Continue to manager →</button></form>
-{% if error %}<div class="form-error">{{error}}</div>{% endif %}
+{% if not password_set %}<div class="form-error">ADMIN_PASSWORD is not configured on the server, so sign-in is disabled. Set it in <code>.env</code> and restart.</div>{% endif %}
+<form method="post" class="login-form"><input type="hidden" name="csrf" value="{{ csrf_token() }}" /><label>Password<input type="password" name="password" required autofocus autocomplete="current-password" placeholder="Manager password" /></label><button class="btn btn-primary btn-wide" type="submit">Continue to manager →</button></form>
+{% if error %}<div class="form-error" id="login-error">{{error}}</div>{% endif %}
 </div>
 {% endblock %}

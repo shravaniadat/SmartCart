@@ -1,0 +1,24 @@
+# systemd unit: start SmartMart at boot on the Raspberry Pi.
+# Install (adjust User/paths if your username is not "pi" or folder differs):
+#   sudo cp deploy/smartmart.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now smartmart
+#   journalctl -u smartmart -f        # live log
+[Unit]
+Description=SmartMart RFID smart cart
+After=network-online.target sound.target
+Wants=network-online.target
+
+[Service]
+User=pi
+# gpio/spi/i2c/audio give access to the RC522, HX711, LCD and 3.5 mm jack without root
+SupplementaryGroups=gpio spi i2c audio
+WorkingDirectory=/home/pi/SmartCart
+# ADMIN_PASSWORD, MERCHANT_UPI_ID ... are read from /home/pi/SmartCart/.env
+ExecStart=/home/pi/SmartCart/venv/bin/python app.py --server waitress
+Restart=on-failure
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

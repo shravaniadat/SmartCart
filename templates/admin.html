@@ -2,8 +2,8 @@
 {% block title %}SmartMart · Manager{% endblock %}
 {% block page %}admin{% endblock %}
 {% block navigation %}
-  <a class="nav-link selected" href="/admin">Manager</a><a class="nav-link" href="/inventory">Inventory <span>↗</span></a><a class="nav-link" href="/customer?cart=CART-01">Customer view</a>
-  <form action="/logout" method="post"><button class="nav-logout" type="submit">Sign out</button></form>
+  <a class="nav-link selected" href="/admin">Manager</a><a class="nav-link" href="/inventory">Inventory <span>↗</span></a><a class="nav-link" href="/customer?cart=CART-01" target="_blank" rel="noopener">Customer view</a>
+  <form action="/logout" method="post"><input type="hidden" name="csrf" value="{{ csrf_token() }}" /><button class="nav-logout" type="submit">Sign out</button></form>
 {% endblock %}
 {% block content %}
 <section class="page-intro"><div><div class="eyebrow"><span class="eyebrow-mark"></span> STORE OPERATIONS</div><h1>Manager <em>overview.</em></h1><p>See every cart, manage RFID tags, and monitor live store activity.</p></div><a class="btn btn-primary" href="/inventory">Open inventory <span>↗</span></a></section>
@@ -11,35 +11,62 @@
   <div class="stat"><span class="stat-icon">🛒</span><div><div class="stat-label">REGISTERED CARTS</div><div class="stat-value" id="admin-carts">3</div></div></div>
   <div class="stat"><span class="stat-icon">◉</span><div><div class="stat-label">RFID SCANS</div><div class="stat-value" id="admin-scans">0</div></div></div>
   <div class="stat"><span class="stat-icon">◷</span><div><div class="stat-label">PENDING CHECKOUTS</div><div class="stat-value" id="admin-pending">0</div></div></div>
-  <div class="stat"><span class="stat-icon">△</span><div><div class="stat-label">UNKNOWN TAGS</div><div class="stat-value" id="admin-unknown">0</div></div></div>
+  <div class="stat"><span class="stat-icon">△</span><div><div class="stat-label">ALERTS</div><div class="stat-value" id="admin-unknown">0</div></div></div>
+</section>
+<section class="panel hw-panel">
+  <div class="hw-head"><div><div class="eyebrow muted">HARDWARE STATUS</div><h2>Devices</h2></div>
+    <label class="switch"><input type="checkbox" id="mute-toggle" /><span>Mute speaker</span></label></div>
+  <div class="hw-grid" id="hw-grid"><span class="small-muted">Checking devices...</span></div>
 </section>
 <section class="workspace admin-workspace">
-  <div class="panel map-panel"><div class="panel-head"><div><div class="eyebrow muted">LOCATION CONTROL</div><h2>Live shop overview</h2><p>All carts and product sections on one floor map.</p></div><span class="label-pill">DEMO TRACKING</span></div>
+  <div class="panel map-panel"><div class="panel-head"><div><div class="eyebrow muted">LOCATION CONTROL</div><h2>Live shop overview</h2><p>All carts and product sections on one floor map.</p></div><span class="label-pill">MANUAL TRACKING</span></div>
     <div class="map-key"><span><i class="legend-cart"></i> Reported cart location</span><span><i class="legend-section"></i> Store section</span></div>
     <div class="floor-map" id="admin-map"></div>
     <div class="map-caption"><span class="info-bubble">i</span> Positions are manager-entered, not measured automatically.</div>
+    <h3 class="subheading">All carts</h3>
+    <div class="table-scroll"><table class="mini-table"><thead><tr><th>Cart</th><th>Section</th><th class="numeric">Items</th><th class="numeric">Total</th><th>Status</th></tr></thead><tbody id="cart-rows"></tbody></table></div>
   </div>
   <div class="right-stack">
     <div class="panel compact-panel"><div class="panel-head"><div><div class="eyebrow muted">HARDWARE CONTROL</div><h2>RFID reader</h2></div><span id="reader-status" class="tag tag-warning">Checking...</span></div>
-      <p class="small-muted">Your single RC522 can send scans to one selected cart at a time.</p>
-      <form id="reader-form" class="stacked-form"><label>Reader assigned to<select id="reader-cart" name="cart_id"><option>CART-01</option></select></label><button class="btn btn-dark" type="submit">Assign reader</button></form>
-      <div id="demo-scanner" class="demo-section" hidden><div class="eyebrow muted">TEST MODE ONLY</div><form id="demo-form" class="inline-form"><input id="demo-uid" placeholder="Registered tag UID" required/><button type="submit" class="btn btn-outline">Test scan</button></form></div>
+      <p class="small-muted">Your single RC522 (and the load cell) belong to one selected cart at a time.</p>
+      <form id="reader-form" class="inline-form"><select id="reader-cart" name="cart_id" aria-label="Reader assigned to"><option>CART-01</option></select><button class="btn btn-dark" type="submit">Assign reader</button></form>
+      <div id="demo-scanner" class="demo-section" hidden><div class="eyebrow muted">TEST MODE ONLY · SIMULATED READER</div>
+        <form id="demo-form" class="inline-form"><input id="demo-uid" placeholder="Tag UID, e.g. 799992525454" required autocomplete="off" /><button type="submit" class="btn btn-outline">Test scan</button></form>
+        <div class="chip-row" id="demo-chips"></div>
+      </div>
     </div>
     <div class="panel compact-panel"><div class="panel-head"><div><div class="eyebrow muted">CART LOCATION</div><h2>Update position</h2></div></div>
-      <form id="location-form" class="stacked-form"><label>Cart<select id="location-cart" name="cart_id"></select></label><label>Current section<select id="location-zone" name="zone"></select></label><button type="submit" class="btn btn-dark">Update position</button></form>
+      <form id="location-form" class="stacked-form two-col"><label>Cart<select id="location-cart" name="cart_id"></select></label><label>Current section<select id="location-zone" name="zone"></select></label><button type="submit" class="btn btn-dark">Update position</button></form>
+    </div>
+    <div class="panel compact-panel" id="scale-panel"><div class="panel-head"><div><div class="eyebrow muted">LOAD CELL · HX711</div><h2>Weight check</h2></div><span id="weight-tag" class="tag tag-warning">-</span></div>
+      <div class="weight-readout"><div><small>Measured</small><strong id="w-measured">-</strong></div><div><small>Expected</small><strong id="w-expected">-</strong></div><div><small>Allowed ±</small><strong id="w-allowed">-</strong></div></div>
+      <div class="inline-form"><button class="btn btn-outline" id="tare-btn" type="button">Tare (empty cart)</button></div>
+      <form id="calibrate-form" class="inline-form"><input id="cal-grams" type="number" min="1" step="1" placeholder="Known weight (g), e.g. 1000" required /><button class="btn btn-outline" type="submit">Calibrate</button></form>
+      <div id="demo-scale" class="demo-section" hidden><div class="eyebrow muted">DEMO FAKE WEIGHT</div>
+        <label class="switch"><input type="checkbox" id="demo-follow" checked /><span>Scale follows expected weight</span></label>
+        <form id="demo-weight-form" class="inline-form"><input id="demo-grams" type="number" min="0" step="1" placeholder="Fake weight (g)" /><button class="btn btn-outline" type="submit">Set weight</button></form>
+        <button class="btn btn-ghost" id="demo-mismatch" type="button">Simulate unscanned item (+500 g)</button>
+      </div>
     </div>
   </div>
 </section>
+<section class="panel tags-panel" id="tags">
+  <div class="panel-head"><div><div class="eyebrow muted">IDENTIFICATION</div><h2>RFID tag management</h2><p>Assign a physical tag UID to a product, remove tags, and re-activate sold tags after restocking.</p></div></div>
+  <form id="register-form" class="register-grid">
+    <label>RFID UID<div class="uid-row"><input name="uid" id="register-uid" placeholder="Type / paste UID or press Scan" required autocomplete="off" /><button class="btn btn-dark" id="scan-register-btn" type="button">Scan to register</button></div></label>
+    <label>Product<select name="product_id" id="register-product" required></select></label>
+    <button class="btn btn-primary" type="submit">Save tag</button>
+  </form>
+  <div id="scan-register-status" class="scan-status" hidden></div>
+  <div class="tags-toolbar"><h3 class="subheading">All tags <span class="count-chip" id="tag-count">0</span></h3><input id="tag-search" placeholder="Search UID, product or SKU..." aria-label="Search tags" /></div>
+  <div class="table-scroll"><table class="inventory-table tag-table"><thead><tr><th>UID</th><th>Product</th><th>SKU</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="tag-rows"></tbody></table></div>
+</section>
 <section class="workspace admin-bottom">
-  <div class="panel"><div class="panel-head"><div><div class="eyebrow muted">IDENTIFICATION</div><h2>RFID tag management</h2><p>Assign a physical tag UID to a product, or unregister one.</p></div></div>
-    <form id="register-form" class="form-grid"><label>RFID UID<input name="uid" id="register-uid" placeholder="e.g. 799992525454" required /></label><label>Product<select name="product_id" id="register-product" required></select></label><button class="btn btn-primary form-submit" type="submit">Register RFID tag</button></form>
-    <div class="divider-line"></div>
-    <form id="unregister-form" class="inline-form"><input id="unregister-uid" placeholder="Tag UID to unregister" required /><button class="btn btn-outline" type="submit">Unregister</button></form>
-    <h3 class="subheading">Recently registered tags</h3><div id="tag-list" class="tag-list"><div class="small-muted">Loading...</div></div>
-  </div>
-  <div class="panel"><div class="panel-head"><div><div class="eyebrow muted">REAL-TIME NOTIFICATIONS</div><h2>Store activity</h2><p>Manager alerts when a product is scanned, registered, or billed.</p></div><span class="activity-dot"></span></div>
+  <div class="panel"><div class="panel-head"><div><div class="eyebrow muted">REAL-TIME NOTIFICATIONS</div><h2>Alerts &amp; activity</h2><p>Scans, unknown tags, out-of-stock, weight mismatches and registrations.</p></div><span class="activity-dot"></span></div>
     <div id="admin-events" class="event-stream"></div>
-    <h3 class="subheading">Awaiting payment verification</h3><div id="pending-orders" class="pending-list"></div>
+  </div>
+  <div class="panel"><div class="panel-head"><div><div class="eyebrow muted">MANAGER CHECK</div><h2>Awaiting payment verification</h2><p>Only verify after you see the money in your merchant app or receive cash. The QR alone proves nothing.</p></div></div>
+    <div id="pending-orders" class="pending-list"></div>
   </div>
 </section>
 {% endblock %}
