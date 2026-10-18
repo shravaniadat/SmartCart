@@ -1,4 +1,7 @@
+# Web app (Windows, macOS, Linux, Raspberry Pi)
 Flask>=2.3,<4
 qrcode[pil]>=7.4
-# On Raspberry Pi, use a 3.3V RC522 and install mfrc522 plus compatible GPIO dependencies.
-# Hardware-only dependency: pip install --no-deps mfrc522
+# Optional production-ish server on the Pi: python app.py --server waitress
+waitress>=2.1
+# Tests: python -m pytest -q   (browser check: pip install playwright)
+pytest>=7

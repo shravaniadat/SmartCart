@@ -1,0 +1,15 @@
+# runtime data / secrets
+smartmart.db
+smartmart.db-*
+*.db-wal
+*.db-shm
+.session_secret
+.env
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+.venv/
+# test output
+tests/screenshots/
